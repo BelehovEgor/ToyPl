@@ -26,28 +26,35 @@ public class ClosureOperationTests
     public void Do_FewValidStates_ShouldReturnAllCombinations()
     {
         // Arrange
-        var state = StateBuilder.Build(3);
-        var states = new []
-        {
-            state
-        };
+        var state = new StateBuilder()
+            .WithVariable("A", 1)
+            .WithVariable("B", 2)
+            .Build();
+        var states = new[] { state };
 
         var bodyMock = new Mock<IOperation>(MockBehavior.Strict);
 
         var newStates1 = new[]
         {
-            state,
-            StateBuilder.Build(3),
-            StateBuilder.Build(3)
+            new StateBuilder()
+                .WithVariable("A", 3)
+                .WithVariable("B", 4)
+                .Build(),
+            new StateBuilder()
+                .WithVariable("A", 5)
+                .WithVariable("B", 6)
+                .Build()
         };
-        
         bodyMock
             .Setup(x => x.Do(states))
             .Returns(newStates1);
+        
         var newStates2 = new[]
         {
-            StateBuilder.Build(3),
-            StateBuilder.Build(3)
+            new StateBuilder()
+                .WithVariable("A", 7)
+                .WithVariable("B", 8)
+                .Build()
         };
         bodyMock
             .Setup(x => x.Do(newStates1))

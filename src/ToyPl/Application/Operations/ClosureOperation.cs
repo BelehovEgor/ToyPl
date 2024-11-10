@@ -8,20 +8,25 @@ public class ClosureOperation(IOperation body) : IOperation
     {
         if (states.Count == 0) return [];
         
-        var lastDoStates = states;
-        var newStates = new HashSet<State>(states, new StateComparer());
-        var prevCount = -1;
-        while (prevCount != newStates.Count)
+        var rk = body;
+        var r0 = body.Do(states);
+        
+        var unionStates = new HashSet<State>(r0, new StateComparer());
+        
+        int prevCount;
+        do
         {
-            prevCount = newStates.Count;
-            lastDoStates = body.Do(lastDoStates);
-
-            foreach (var state in lastDoStates)
+            prevCount = unionStates.Count;
+            
+            rk = new CompositionOperation(body, rk);
+            var currentState = rk.Do(states);
+            
+            foreach (var state in currentState)
             {
-                newStates.Add(state);
+                unionStates.Add(state);
             }
-        }
+        } while (prevCount != unionStates.Count);
 
-        return newStates;
+        return unionStates;
     }
 }

@@ -6,8 +6,11 @@ public class UnionOperation(IOperation first, IOperation second) : IOperation
 {
     public IReadOnlyCollection<State> Do(IReadOnlyCollection<State> states)
     {
-        return first.Do(states)
-            .Union(second.Do(states))
+        var firstResult = first.Do(states);
+        var secondResult = second.Do(states);
+        
+        return firstResult
+            .Union(secondResult)
             .Distinct(new StateComparer())
             .ToArray();
     }

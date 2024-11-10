@@ -3,7 +3,10 @@ using ToyPl.Application.Models;
 
 namespace ToyPl.Application.Expressions;
 
-public class Expression(OneOf<string, UnsignedIntModType, Expression> left, OneOf<string, UnsignedIntModType, Expression> right, Operation operation)
+public class Expression(
+    OneOf<string, UnsignedIntModType, Expression> left, 
+    OneOf<string, UnsignedIntModType, Expression> right, 
+    Operation operation)
 {
     public UnsignedIntModType Calc(State state)
     {

@@ -11,8 +11,7 @@ public class AssignOperationTests
     {
         // Arrange
         var states = Array.Empty<State>();
-        var newVariable = new Variable("Name", new UnsignedIntModType(4));
-        var assignOperation = new AssignOperation(newVariable);
+        var assignOperation = new AssignOperation("Name", new UnsignedIntModType(4));
 
         // Act
         var result = assignOperation.Do(states);
@@ -26,8 +25,7 @@ public class AssignOperationTests
     {
         // Arrange
         var states = new [] { StateBuilder.Build(1) };
-        var newVariable = new Variable("Name", new UnsignedIntModType(4));
-        var assignOperation = new AssignOperation(newVariable);
+        var assignOperation = new AssignOperation("Name", new UnsignedIntModType(4));
 
         // Act
         var act = () => assignOperation.Do(states);
@@ -47,7 +45,7 @@ public class AssignOperationTests
         var state = StateBuilder.Build(oldVariable);
         var states = new [] { state };
         var newVariable = oldVariable with { Value = newValue};
-        var assignOperation = new AssignOperation(newVariable);
+        var assignOperation = new AssignOperation(name, newValue);
 
         // Act
         var result = assignOperation.Do(states);
@@ -71,7 +69,7 @@ public class AssignOperationTests
         var states = new [] { state };
         var oldVariable = state.Variables.First().Value;
         var newVariable = oldVariable with { Value = new UnsignedIntModType(2) };
-        var assignOperation = new AssignOperation(newVariable);
+        var assignOperation = new AssignOperation(newVariable.Name, newVariable.Value);
 
         // Act
         var result = assignOperation.Do(states);

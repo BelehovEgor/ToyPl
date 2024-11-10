@@ -1,3 +1,4 @@
+using ToyPl.Application.Expressions;
 using ToyPl.Application.Models;
 using ToyPl.Application.Operations;
 using ToyPl.UnitTests.Builders;
@@ -165,11 +166,10 @@ public class OperationsChainTests
         var result = closureOperation.Do([state]);
 
         // Assert
-        result.Should().HaveCount(3);
+        result.Should().HaveCount(2);
 
         var expectedStates = new[]
         {
-            StateBuilder.Build("A", 1),
             StateBuilder.Build("A", 2),
             StateBuilder.Build("A", 3)
         };
@@ -190,7 +190,7 @@ public class OperationsChainTests
         var assignOperation1 = new AssignOperation(newVariable1);
         var assignOperation2 = new AssignOperation(newVariable2);
 
-        bool Predicate(State state) => state.Variables["A"].Value.Value % 2 == 1;
+        bool Predicate(State s) => s.Variables["A"].Value.Value % 2 == 1;
         var ifOperation = new UnionOperation(
             new CompositionOperation(
                 new TestOperation(Predicate),
@@ -208,37 +208,24 @@ public class OperationsChainTests
 
         resultState.ShouldDeepEqual(StateBuilder.Build(newVariable1));
     }
-    
+
     [Fact]
-    public void Do_While_ShouldReturnThen()
+    public void Do_Closure_ReturnStates()
     {
         // Arrange
         var state = new StateBuilder()
-            .WithVariable("A", 1)
+            .WithVariable("A", 0)
             .Build();
 
-        var newVariable1 = VariableBuilder.Build("A", 2);
-
-        var assignOperation1 = new AssignOperation(newVariable1);
-
-        bool Predicate(State state) => state.Variables["A"].Value.Value % 2 == 1;
-        var whileOperation = new ClosureOperation(
-            new CompositionOperation(
-                new CompositionOperation(new TestOperation(Predicate), assignOperation1),
-                new TestOperation(x => !Predicate(x))));
+        var left = new AssignOperation("A", new UnsignedIntModType(1));
+        var right = new AssignOperation("A", new Expression("A", new UnsignedIntModType(2), PlusOperation.Create));
+        var union = new UnionOperation(left, right);
+        var closure = new ClosureOperation(union);
 
         // Act
-        var result = whileOperation.Do([state]);
+        var result = closure.Do([state]);
 
         // Assert
-        
-        // Not true while cause while -> Ui where i > 0, but closure Ui where i >= 0
-        result.Should().HaveCount(2);
-        result.ShouldDeepEqual(
-            new[]
-            {
-                state,
-                StateBuilder.Build(newVariable1)
-            });
+        result.Should().HaveCount(8); // 0..7
     }
 }
