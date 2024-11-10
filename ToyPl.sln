@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToyPl", "ToyPl\ToyPl.csproj", "{DABBF164-4CDC-491F-8D3B-F21F51CE0193}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DABBF164-4CDC-491F-8D3B-F21F51CE0193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DABBF164-4CDC-491F-8D3B-F21F51CE0193}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DABBF164-4CDC-491F-8D3B-F21F51CE0193}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DABBF164-4CDC-491F-8D3B-F21F51CE0193}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
