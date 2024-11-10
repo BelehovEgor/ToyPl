@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace ToyPl.Application.Models;
 
 public record State(IDictionary<string, Variable> Variables)
@@ -7,6 +9,11 @@ public record State(IDictionary<string, Variable> Variables)
         var comparer = new StateComparer();
 
         return comparer.Equals(this, other);
+    }
+
+    public string ToBeautyString()
+    {
+        return $"{{ {string.Join(", ", Variables.Values.Select(x => $"{x.Name}: {x.Value}"))} }}";
     }
 }
 

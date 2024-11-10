@@ -9,7 +9,7 @@ public class ClosureOperation(IOperation body) : IOperation
         if (states.Count == 0) return [];
         
         var lastDoStates = states;
-        var newStates = new HashSet<State>(new StateComparer());
+        var newStates = new HashSet<State>(states, new StateComparer());
         var prevCount = -1;
         while (prevCount != newStates.Count)
         {

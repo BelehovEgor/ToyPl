@@ -2,10 +2,29 @@ using ToyPl.Application.Models;
 
 namespace ToyPl.UnitTests.Builders;
 
-public static class StateBuilder
+public class StateBuilder
 {
     private static uint _value;
     private static uint Next => _value++ % UnsignedIntModType.MaxValue;
+
+    private List<Variable> _variables = new();
+
+    public StateBuilder WithVariable(Variable variable)
+    {
+        _variables.Add(variable);
+        return this;
+    }
+    
+    public StateBuilder WithVariable(string name, uint value)
+    {
+        _variables.Add(new Variable(name, new UnsignedIntModType(value)));
+        return this;
+    }
+
+    public State Build()
+    {
+        return new State(_variables.ToDictionary(x => x.Name));
+    }
     
     public static State Build(int variablesCount) => new(
         Enumerable
@@ -19,9 +38,14 @@ public static class StateBuilder
             {variable.Name, variable}
         });
     
-    public static State Build(string variableName) => new(
+    public static State Build(string variableName, uint variableValue) => new(
         new Dictionary<string, Variable>
         {
-            {variableName, new Variable(variableName, new UnsignedIntModType(Next))}
+            {variableName, new Variable(variableName, new UnsignedIntModType(variableValue))}
         });
+}
+
+public static class VariableBuilder
+{
+    public static Variable Build(string name, uint value = 1) => new(name, new UnsignedIntModType(value));
 }
