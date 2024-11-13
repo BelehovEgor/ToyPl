@@ -1,4 +1,5 @@
 using Antlr4.Runtime.Tree;
+using ToyPl.Application.Conditions;
 using ToyPl.Application.Expressions;
 using ToyPl.Application.Models;
 using ToyPl.Application.Operations;
@@ -71,8 +72,10 @@ public class ToyPlTranslator : ItoyPlParserVisitor<IOperation>
                 toyPlParser.ExprContext exprContext
             ] => new AssignOperation(GetVar(varContext), GetExpression(exprContext)),
             
-            [toyPlParser.CondContext condContext, TerminalNodeImpl { Symbol.Text: "?" }]
-                => new TestOperation(GetPredicate(condContext)),
+            [
+                toyPlParser.CondContext condContext, 
+                TerminalNodeImpl { Symbol.Text: "?" }
+            ] => new TestOperation(GetPredicate(condContext)),
             
             [
                 TerminalNodeImpl { Symbol.Text: "(" }, 
@@ -119,13 +122,89 @@ public class ToyPlTranslator : ItoyPlParserVisitor<IOperation>
         return varName;
     }
 
-    private Expression GetExpression(toyPlParser.ExprContext exprContext)
+    private PossibleValue GetExpression(toyPlParser.ExprContext exprContext)
     {
-        return new Expression("a", "a", new PlusOperation());
+        return exprContext.children switch
+        {
+            [ toyPlParser.VarContext varContext ] => GetVar(varContext),
+            
+            [ TerminalNodeImpl terminalNodeImpl ] => new UnsignedIntModType(uint.Parse(terminalNodeImpl.GetText())),
+            
+            [
+                TerminalNodeImpl { Symbol.Text: "(" }, 
+                toyPlParser.ExprContext left, 
+                toyPlParser.Int_opContext opContext, 
+                toyPlParser.ExprContext right, 
+                TerminalNodeImpl { Symbol.Text: ")" }
+            ] => new Expression(GetExpression(left), GetExpression(right), GetOperation(opContext)),
+            
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
     
-    private Predicate<State> GetPredicate(toyPlParser.CondContext condContext)
+    private ICondition GetPredicate(toyPlParser.CondContext condContext)
     {
-        return _ => true;
+        return condContext.children switch
+        {
+            [
+                TerminalNodeImpl { Symbol.Text: "(" }, 
+                toyPlParser.ExprContext left, 
+                toyPlParser.Cond_int_opContext opContext, 
+                toyPlParser.ExprContext right, 
+                TerminalNodeImpl { Symbol.Text: ")" }
+            ] => new Condition([GetExpression(left), GetExpression(right)], GetComparator(opContext)),
+            
+            [
+                TerminalNodeImpl { Symbol.Text: "!" }, 
+                toyPlParser.CondContext cond
+            ] => new NotCondition(GetPredicate(cond)),
+            
+            [
+                TerminalNodeImpl { Symbol.Text: "(" }, 
+                toyPlParser.CondContext left, 
+                toyPlParser.Cond_bool_opContext opContext, 
+                toyPlParser.CondContext right, 
+                TerminalNodeImpl { Symbol.Text: ")" }
+            ] when opContext.GetText() == "&&"
+                => new AndCondition(GetPredicate(left), GetPredicate(right)),
+            
+            [
+                TerminalNodeImpl { Symbol.Text: "(" }, 
+                toyPlParser.CondContext left, 
+                toyPlParser.Cond_bool_opContext opContext, 
+                toyPlParser.CondContext right, 
+                TerminalNodeImpl { Symbol.Text: ")" }
+            ] when opContext.GetText() == "||"
+                => new OrCondition(GetPredicate(left), GetPredicate(right)),
+            
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    private Comparator GetComparator(toyPlParser.Cond_int_opContext opContext)
+    {
+        return opContext.GetText() switch
+        {
+            "=" => Equal.Create,
+            "/=" => NotEqual.Create,
+            ">" => Greater.Create,
+            ">=" => GreaterOrEqual.Create,
+            "<" => Less.Create,
+            "<=" => LessOrEqual.Create,
+            _ => throw new ArgumentOutOfRangeException(nameof(opContext), opContext, null)
+        };
+    }
+    
+    private Operation GetOperation(toyPlParser.Int_opContext opContext)
+    {
+        return opContext.GetText() switch
+        {
+            "+" => PlusOperation.Create,
+            "-" => MinusOperation.Create,
+            "*" => TimesOperation.Create,
+            "/" => DivOperation.Create,
+            "%" => ModOperation.Create,
+            _ => throw new ArgumentOutOfRangeException(nameof(opContext), opContext, null)
+        };
     }
 }

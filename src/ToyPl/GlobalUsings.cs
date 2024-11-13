@@ -1,0 +1,1 @@
+global using PossibleValue = OneOf.OneOf<string, ToyPl.Application.Models.UnsignedIntModType, ToyPl.Application.Expressions.Expression>;

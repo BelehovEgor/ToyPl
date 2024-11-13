@@ -1,3 +1,5 @@
+using ToyPl.Application.Conditions;
+using ToyPl.Application.Expressions;
 using ToyPl.Application.Models;
 using ToyPl.Application.Operations;
 using ToyPl.UnitTests.Builders;
@@ -10,10 +12,15 @@ public class TestOperationTests
     public void Do_PredicateReturnFalse_ShouldReturnEmptyStates()
     {
         // Arrange
-        bool Predicate(State _) => false;
-        var operation = new TestOperation(Predicate);
+        var state = new StateBuilder().WithVariable("a", 1).Build();
+        var condition = new Condition(
+            [
+                "a",
+                new UnsignedIntModType(1)
+            ], 
+            NotEqual.Create);
+        var operation = new TestOperation(condition);
 
-        var state = StateBuilder.Build(2);
         var states = new[] { state };
 
         // Act
@@ -27,10 +34,15 @@ public class TestOperationTests
     public void Do_PredicateReturnTrue_ShouldReturnSameStates()
     {
         // Arrange
-        bool Predicate(State _) => true;
-        var operation = new TestOperation(Predicate);
+        var state = new StateBuilder().WithVariable("a", 1).Build();
+        var condition = new Condition(
+            [
+                "a",
+                new UnsignedIntModType(1)
+            ], 
+            Equal.Create);
+        var operation = new TestOperation(condition);
 
-        var state = StateBuilder.Build(2);
         var states = new[] { state };
 
         // Act
@@ -46,11 +58,15 @@ public class TestOperationTests
     public void Do_PredicateByOddVariableCount_ShouldReturnStatesWithOddVariableCount()
     {
         // Arrange
-        bool Predicate(State state) => state.Variables.Count % 2 == 1;
-        var operation = new TestOperation(Predicate);
-
-        var oddState = StateBuilder.Build(1);
-        var notOddState = StateBuilder.Build(2);
+        var oddState = new StateBuilder().WithVariable("a", 1).Build();
+        var notOddState = new StateBuilder().WithVariable("a", 2).Build();
+        var condition = new Condition(
+            [
+                new Expression("a", new UnsignedIntModType(2), ModOperation.Create),
+                new UnsignedIntModType(1)
+            ], 
+            Equal.Create);
+        var operation = new TestOperation(condition);
 
         var states = new[] { oddState, notOddState };
 
