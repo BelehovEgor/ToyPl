@@ -13,7 +13,7 @@ public record State(IDictionary<string, Variable> Variables)
 
     public string ToBeautyString()
     {
-        return $"{{ {string.Join(", ", Variables.Values.Select(x => $"{x.Name}: {x.Value}"))} }}";
+        return $"({string.Join(", ", Variables.Values.Select(x => $"{x.Name}: {x.Value.Value}"))})";
     }
 }
 

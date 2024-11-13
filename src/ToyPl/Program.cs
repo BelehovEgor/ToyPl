@@ -1,34 +1,39 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using Antlr4.Runtime;
-using ToyPl.Application.Models;
+﻿using ToyPl.Application.Models;
 using ToyPl.Translation;
 
-var toyPlProgram = 
-    """
-    (
-        ((a := (a + 2)) U (a := (a + 4)) * ) ; ((a % 4) = 1) ?
-    )
-    """;
-
-var stream = CharStreams.fromString(toyPlProgram);
-var lexer = new toyPlLexer(stream);
-var tokens = new CommonTokenStream(lexer);
-var parser = new toyPlParser(tokens);
+if (args.Length == 0)
+{
+    Console.WriteLine("Укажите программный файл");
+    Environment.Exit(1);
+}
 
 try
 {
-    var visitor = new ToyPlTranslator();
-    var program = parser.program().Accept(visitor);
+    var (program, programVariables)  = new ProgramReader().GetProgram(args[0]);
 
-    var variable = new Variable("a", new UnsignedIntModType(1));
-    var variables = new Dictionary<string, Variable>
+    Console.WriteLine($"Введите переменные в порядке ({string.Join(", ", programVariables)}):");
+    var readVars = Console.ReadLine()?.Split()
+        .Where(x => uint.TryParse(x, out _))
+        .Select(uint.Parse)
+        .ToArray();
+
+    if (readVars?.Length != programVariables.Count)
     {
-        { "a", variable }
-    };
-    var state = new State(variables);
+        Console.WriteLine("Неверное число значений переменных");
+        Environment.Exit(1);
+    }
+
+    var variablesDict = programVariables
+        .Zip(readVars)
+        .Select(x => new Variable(x.First, new UnsignedIntModType(x.Second)))
+        .ToDictionary(x => x.Name);
+    var state = new State(variablesDict);
 
     var result = program.Do([state]);
+    foreach (var finalState in result)
+    {
+        Console.WriteLine(finalState.ToBeautyString());
+    }
 }
 catch (Exception ex)
 {
