@@ -6,6 +6,11 @@ namespace ToyPl.UnitTests.ToyPlExamples;
 
 public class ExamplesTests
 {
+    public ExamplesTests()
+    {
+        Constants.N = 5;
+    }
+    
     [Fact]
     public void Do_Assign_Success()
     {
@@ -327,5 +332,36 @@ public class ExamplesTests
         {
             actualState.Variables["s"].Value.Should().Be(new UnsignedIntModType(expectedValue));
         }
+    }
+
+    [Theory]
+    [InlineData(1, 4)]   // 0ms
+    [InlineData(2, 12)]   // 1ms
+    [InlineData(3, 32)]  // 1ms
+    [InlineData(4, 80)]  // 112ms
+    [InlineData(5, 192)] // 340ms
+    [InlineData(6, 192)] // 340ms
+    [InlineData(7, 1024)] // 26s 391ms
+    [InlineData(8, 1)]   // 4m 34s 
+    public void Do_Boom_Success(int n, int stateCount)
+    {
+        // Arrange
+        Constants.N = n;
+        
+        var fileName = "../../../ToyPlExamples/boom.tpl";
+        var programReader = new ProgramReader();
+        var (program, _) = programReader.GetProgram(fileName);
+
+        var state = new StateBuilder()
+            .WithVariable("a", 1)
+            .WithVariable("b", 1)
+            .WithVariable("c", 1)
+            .Build();
+
+        // Act
+        var result = program.Do([state]);
+
+        // Assert
+        result.Should().HaveCount(stateCount);
     }
 }
