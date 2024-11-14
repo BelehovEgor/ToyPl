@@ -11,19 +11,20 @@ try
 {
     var (program, programVariables)  = new ProgramReader().GetProgram(args[0]);
 
-    Console.WriteLine($"Введите переменные в порядке ({string.Join(", ", programVariables)}):");
+    var sortedVariables = programVariables.Order().ToArray();
+    Console.WriteLine($"Введите переменные в порядке ({string.Join(", ", sortedVariables)}):");
     var readVars = Console.ReadLine()?.Split()
         .Where(x => uint.TryParse(x, out _))
         .Select(uint.Parse)
         .ToArray();
 
-    if (readVars?.Length != programVariables.Count)
+    if (readVars?.Length != sortedVariables.Length)
     {
         Console.WriteLine("Неверное число значений переменных");
         Environment.Exit(1);
     }
 
-    var variablesDict = programVariables
+    var variablesDict = sortedVariables
         .Zip(readVars)
         .Select(x => new Variable(x.First, new UnsignedIntModType(x.Second)))
         .ToDictionary(x => x.Name);
