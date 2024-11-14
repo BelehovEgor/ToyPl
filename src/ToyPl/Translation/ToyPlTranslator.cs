@@ -155,8 +155,10 @@ public class ToyPlTranslator : ItoyPlParserVisitor<IOperation>
             ] => new Condition([GetExpression(left), GetExpression(right)], GetComparator(opContext)),
             
             [
+                TerminalNodeImpl { Symbol.Text: "(" }, 
                 TerminalNodeImpl { Symbol.Text: "!" }, 
-                toyPlParser.CondContext cond
+                toyPlParser.CondContext cond,
+                TerminalNodeImpl { Symbol.Text: ")" }
             ] => new NotCondition(GetPredicate(cond)),
             
             [
@@ -176,6 +178,12 @@ public class ToyPlTranslator : ItoyPlParserVisitor<IOperation>
                 TerminalNodeImpl { Symbol.Text: ")" }
             ] when opContext.GetText() == "||"
                 => new OrCondition(GetPredicate(left), GetPredicate(right)),
+            
+            [
+                TerminalNodeImpl { Symbol.Text: "(" }, 
+                toyPlParser.CondContext cond, 
+                TerminalNodeImpl { Symbol.Text: ")" }
+            ] => GetPredicate(cond),
             
             _ => throw new ArgumentOutOfRangeException()
         };
