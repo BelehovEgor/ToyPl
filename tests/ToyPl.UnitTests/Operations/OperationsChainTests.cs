@@ -1,3 +1,4 @@
+using ToyPl.Application.Conditions;
 using ToyPl.Application.Expressions;
 using ToyPl.Application.Models;
 using ToyPl.Application.Operations;
@@ -190,13 +191,25 @@ public class OperationsChainTests
         var assignOperation1 = new AssignOperation(newVariable1);
         var assignOperation2 = new AssignOperation(newVariable2);
 
-        bool Predicate(State s) => s.Variables["A"].Value.Value % 2 == 1;
+        var condition = new Condition(
+            [
+                new Expression("A", new UnsignedIntModType(2), ModOperation.Create),
+                new UnsignedIntModType(1)
+            ], 
+            Equal.Create);
+        var notCondition = new Condition(
+            [
+                new Expression("A", new UnsignedIntModType(2), ModOperation.Create),
+                new UnsignedIntModType(1)
+            ], 
+            NotEqual.Create);
+        
         var ifOperation = new UnionOperation(
             new CompositionOperation(
-                new TestOperation(Predicate),
+                new TestOperation(condition),
                 assignOperation1),
             new CompositionOperation(
-                new TestOperation(x => !Predicate(x)),
+                new TestOperation(notCondition),
                 assignOperation2));
 
         // Act

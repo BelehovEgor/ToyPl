@@ -4,8 +4,8 @@ using ToyPl.Application.Models;
 namespace ToyPl.Application.Expressions;
 
 public class Expression(
-    OneOf<string, UnsignedIntModType, Expression> left, 
-    OneOf<string, UnsignedIntModType, Expression> right, 
+    PossibleValue left, 
+    PossibleValue right, 
     Operation operation)
 {
     public UnsignedIntModType Calc(State state)
@@ -13,7 +13,7 @@ public class Expression(
         return operation.Invoke(Calc(left, state), Calc(right, state));
     }
 
-    private UnsignedIntModType Calc(OneOf<string, UnsignedIntModType, Expression> value, State state)
+    private UnsignedIntModType Calc(PossibleValue value, State state)
     {
         return value.Value switch
         {
