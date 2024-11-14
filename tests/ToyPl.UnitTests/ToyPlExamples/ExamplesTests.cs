@@ -342,7 +342,7 @@ public class ExamplesTests
     [InlineData(5, 192)] // 340ms
     [InlineData(6, 192)] // 340ms
     [InlineData(7, 1024)] // 26s 391ms
-    [InlineData(8, 1)]   // 4m 34s 
+    [InlineData(8, 2304)]   // 4m 34s 
     public void Do_Boom_Success(int n, int stateCount)
     {
         // Arrange
