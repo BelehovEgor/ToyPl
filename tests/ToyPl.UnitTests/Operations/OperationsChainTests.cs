@@ -226,6 +226,8 @@ public class OperationsChainTests
     public void Do_Closure_ReturnStates()
     {
         // Arrange
+        Constants.N = 3;
+
         var state = new StateBuilder()
             .WithVariable("A", 0)
             .Build();
