@@ -1,6 +1,6 @@
-﻿using System.Reflection.Metadata;
-using ToyPl;
+﻿using ToyPl;
 using ToyPl.Application.Models;
+using ToyPl.Extensions;
 using ToyPl.Translation;
 
 if (args.Length == 0)
@@ -11,37 +11,28 @@ if (args.Length == 0)
 
 try
 {
-    var (program, programVariables)  = new ProgramReader().GetProgram(args[0]);
+    var programReader = new ProgramReader();
+    var (program, programVariables) = programReader.GetProgram(args[0]);
 
     if (args.Length > 1 && int.TryParse(args[1], out var n) && n > 3)
     {
         Constants.N = n;
     }
 
-    var sortedVariables = programVariables.Order().ToArray();
-    Console.WriteLine($"Write variable values by this order ({string.Join(", ", sortedVariables)}):");
-    var readVars = Console.ReadLine()?.Split()
-        .Where(x => uint.TryParse(x, out _))
-        .Select(uint.Parse)
-        .ToArray();
-
-    if (readVars?.Length != sortedVariables.Length)
+    string? outputMlFile = null;
+    if (args.Length > 2)
     {
-        Console.WriteLine("Wrong count variable values");
-        Environment.Exit(1);
+        outputMlFile = args[2];
     }
 
-    var variablesDict = sortedVariables
-        .Zip(readVars)
-        .Select(x => new Variable(x.First, new UnsignedIntModType(x.Second)))
-        .ToDictionary(x => x.Name);
+    var variablesDict = programVariables
+        .Select(Variable.Create)
+        .ToDictionary(x => x.Name, x => x.Value);
     var state = new State(variablesDict);
 
-    var result = program.Do([state]);
-    foreach (var finalState in result)
-    {
-        Console.WriteLine(finalState.ToBeautyString());
-    }
+    var command = programReader.Translate(program, outputMlFile);
+    var result = command.Execute(state).GetRandom();
+    Console.WriteLine(result?.ToBeautyString() ?? "Failed");
 }
 catch (Exception ex)
 {

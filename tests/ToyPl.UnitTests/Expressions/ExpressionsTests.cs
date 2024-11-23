@@ -12,8 +12,8 @@ public class ExpressionsTests
         // Arrange
         var state = StateBuilder.Build(2);
         
-        var left = new UnsignedIntModType(1);
-        var right = new UnsignedIntModType(2);
+        var left = new PossibleValue(new UnsignedIntModType(1));
+        var right = new PossibleValue(new UnsignedIntModType(2));
 
         var expr = new Expression(left, right, PlusOperation.Create);
 
@@ -33,8 +33,8 @@ public class ExpressionsTests
             .WithVariable("B", 2)
             .Build();
         
-        const string left = "A";
-        const string right = "B";
+        var left = new PossibleValue("A");
+        var right = new PossibleValue("B");
 
         var expr = new Expression(left, right, PlusOperation.Create);
 
@@ -54,9 +54,15 @@ public class ExpressionsTests
             .WithVariable("B", 2)
             .Build();
         
-        var plusExpr = new Expression("A", "B", PlusOperation.Create);
-        var timesExpr = new Expression(plusExpr, new UnsignedIntModType(3), TimesOperation.Create);
-        var minusExpr = new Expression(timesExpr, plusExpr, MinusOperation.Create);
+        var plusExpr = new Expression(new PossibleValue("A"), new PossibleValue("B"), PlusOperation.Create);
+        var timesExpr = new Expression(
+            new PossibleValue(plusExpr), 
+            new PossibleValue(new UnsignedIntModType(3)), 
+            TimesOperation.Create);
+        var minusExpr = new Expression(
+            new PossibleValue(timesExpr), 
+            new PossibleValue(plusExpr), 
+            MinusOperation.Create);
 
         // Act
         var result = minusExpr.Calc(state);

@@ -4,8 +4,6 @@ namespace ToyPl.UnitTests.Builders;
 
 public class StateBuilder
 {
-    private static uint _value;
-    private static uint Next => _value++ % UnsignedIntModType.MaxValue;
 
     private List<Variable> _variables = new();
 
@@ -23,25 +21,25 @@ public class StateBuilder
 
     public State Build()
     {
-        return new State(_variables.ToDictionary(x => x.Name));
+        return new State(_variables.ToDictionary(x => x.Name, x => x.Value));
     }
     
     public static State Build(int variablesCount) => new(
         Enumerable
             .Range(0, variablesCount)
-            .Select(x => new Variable(x.ToString(), new UnsignedIntModType(Next)))
-            .ToDictionary(x => x.Name));
+            .Select(x => Variable.Create(x.ToString()))
+            .ToDictionary(x => x.Name, x => x.Value));
     
     public static State Build(Variable variable) => new(
-        new Dictionary<string, Variable>
+        new Dictionary<string, UnsignedIntModType>
         {
-            {variable.Name, variable}
+            {variable.Name, variable.Value}
         });
     
     public static State Build(string variableName, uint variableValue) => new(
-        new Dictionary<string, Variable>
+        new Dictionary<string, UnsignedIntModType>
         {
-            {variableName, new Variable(variableName, new UnsignedIntModType(variableValue))}
+            {variableName, new UnsignedIntModType(variableValue)}
         });
 }
 

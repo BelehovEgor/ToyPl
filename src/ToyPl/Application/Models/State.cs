@@ -1,8 +1,8 @@
-using System.Text;
+using ToyPl.Extensions;
 
 namespace ToyPl.Application.Models;
 
-public record State(IDictionary<string, Variable> Variables)
+public record State(IDictionary<string, UnsignedIntModType> Variables)
 {
     public bool IsEqual(State other)
     {
@@ -13,11 +13,22 @@ public record State(IDictionary<string, Variable> Variables)
 
     public string ToBeautyString()
     {
-        return $"({string.Join(", ", Variables.Values.Select(x => $"{x.Name}: {x.Value.Value}"))})";
+        return $"({string.Join(", ", Variables.OrderBy(x => x.Key).Select(x => $"{x.Key}: {x.Value.Value}"))})";
+    }
+
+    public State Update(string left, UnsignedIntModType right)
+    {
+        return new State(Variables.Clone())
+        {
+            Variables =
+            {
+                [left] = right
+            }
+        };
     }
 }
 
-public class StateComparer : IEqualityComparer<State>
+public class StateComparer : IEqualityComparer<State?>
 {
     public bool Equals(State? x, State? y)
     {

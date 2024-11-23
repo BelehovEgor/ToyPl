@@ -14,6 +14,8 @@ public class Condition(PossibleValue[] expressions, Comparator comparator)
     {
         return comparator.Invoke(state, expressions);
     }
+    
+    public override string ToString() => $"{expressions[0]} {comparator} {expressions[1]}";
 }
 
 public class NotCondition(ICondition condition) : ICondition
@@ -22,6 +24,8 @@ public class NotCondition(ICondition condition) : ICondition
     {
         return !condition.Check(state);
     }
+
+    public override string ToString() => $"not {condition}";
 }
 
 public class AndCondition(ICondition left, ICondition right) : ICondition
@@ -30,6 +34,8 @@ public class AndCondition(ICondition left, ICondition right) : ICondition
     {
         return left.Check(state) && right.Check(state);
     }
+    
+    public override string ToString() => $"{left} and {right}";
 }
 
 public class OrCondition(ICondition left, ICondition right) : ICondition
@@ -38,5 +44,7 @@ public class OrCondition(ICondition left, ICondition right) : ICondition
     {
         return left.Check(state) || right.Check(state);
     }
+    
+    public override string ToString() => $"{left} or {right}";
 }
 

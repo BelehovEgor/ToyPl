@@ -126,9 +126,11 @@ public class ToyPlTranslator : ItoyPlParserVisitor<IOperation>
     {
         return exprContext.children switch
         {
-            [ toyPlParser.VarContext varContext ] => GetVar(varContext),
+            [ toyPlParser.VarContext varContext ]
+                => new PossibleValue(GetVar(varContext)),
             
-            [ TerminalNodeImpl terminalNodeImpl ] => new UnsignedIntModType(uint.Parse(terminalNodeImpl.GetText())),
+            [ TerminalNodeImpl terminalNodeImpl ] 
+                => new PossibleValue(new UnsignedIntModType(uint.Parse(terminalNodeImpl.GetText()))),
             
             [
                 TerminalNodeImpl { Symbol.Text: "(" }, 
@@ -136,7 +138,7 @@ public class ToyPlTranslator : ItoyPlParserVisitor<IOperation>
                 toyPlParser.Int_opContext opContext, 
                 toyPlParser.ExprContext right, 
                 TerminalNodeImpl { Symbol.Text: ")" }
-            ] => new Expression(GetExpression(left), GetExpression(right), GetOperation(opContext)),
+            ] => new PossibleValue(new Expression(GetExpression(left), GetExpression(right), GetOperation(opContext))),
             
             _ => throw new ArgumentOutOfRangeException()
         };

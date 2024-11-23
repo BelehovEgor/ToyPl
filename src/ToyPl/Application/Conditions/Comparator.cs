@@ -1,26 +1,58 @@
-using OneOf;
-using ToyPl.Application.Expressions;
 using ToyPl.Application.Models;
+using ToyPl.Extensions;
 
 namespace ToyPl.Application.Conditions;
 
 public abstract class Comparator(Func<UnsignedIntModType, UnsignedIntModType, bool> predicate)
 {
-    public bool Invoke(State state, params OneOf<string, UnsignedIntModType, Expression>[] expressions)
+    public bool Invoke(State state, params PossibleValue[] expressions)
     {
         if (expressions.Length != 2) throw new InvalidOperationException();
 
-        return predicate(Calc(expressions[0], state), Calc(expressions[1], state));
+        return predicate(expressions[0].Calc(state), expressions[1].Calc(state));
     }
+}
+
+public class LessOrEqual() : Comparator((l, r) => l.Value <= r.Value)
+{
+    public static Comparator Create => new LessOrEqual();
+
+    public override string ToString() => "<=";
+}
+
+public class NotEqual() : Comparator((l, r) => l.Value != r.Value)
+{
+    public static Comparator Create => new NotEqual();
     
-    private UnsignedIntModType Calc(OneOf<string, UnsignedIntModType, Expression> value, State state)
-    {
-        return value.Value switch
-        {
-            string name => state.Variables[name].Value,
-            UnsignedIntModType intModTypeValue => intModTypeValue,
-            Expression expression => expression.Calc(state),
-            _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
-        };
-    }
+    public override string ToString() => "!=";
+}
+
+public class Less() : Comparator((l, r) => l.Value < r.Value)
+{
+    public static Comparator Create => new Less();
+    
+    public override string ToString() => "<";
+}
+
+public class GreaterOrEqual() : Comparator((l, r) => l.Value >= r.Value)
+{
+    public static Comparator Create => new GreaterOrEqual();
+    
+    
+    public override string ToString() => ">=";
+}
+
+public class Greater() : Comparator((l, r) => l.Value > r.Value)
+{
+    public static Comparator Create => new Greater();
+    
+    public override string ToString() => ">";
+}
+
+
+public class Equal() : Comparator((l, r) => l.Value == r.Value)
+{
+    public static Comparator Create => new Equal();
+    
+    public override string ToString() => "==";
 }
