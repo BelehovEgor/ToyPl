@@ -11,6 +11,20 @@ public abstract class Comparator(Func<UnsignedIntModType, UnsignedIntModType, bo
 
         return predicate(expressions[0].Calc(state), expressions[1].Calc(state));
     }
+
+    public static Comparator FromString(string line)
+    {
+        return line switch
+        {
+            "=" => Equal.Create,
+            "/=" => NotEqual.Create,
+            ">" => Greater.Create,
+            ">=" => GreaterOrEqual.Create,
+            "<" => Less.Create,
+            "<=" => LessOrEqual.Create,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
 }
 
 public class LessOrEqual() : Comparator((l, r) => l.Value <= r.Value)

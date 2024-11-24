@@ -1,5 +1,4 @@
 using ToyPl.Application.Models;
-using ToyPl.Extensions;
 
 namespace ToyPl.Application.Expressions;
 
@@ -15,13 +14,41 @@ public class Expression(
 
     public override string ToString()
     {
-        return $"{left} {operation} {right}";
+        return $"({left} {operation} {right})";
+    }
+
+    public static Expression FromString(string line)
+    {
+        if (line.StartsWith('(') && line.EndsWith(')'))
+        {
+            var parts = line.Substring(1, line.Length - 2).Split(' ');
+            var left = PossibleValue.FromString(parts[0]);
+            var operation = Operation.FromString(parts[1]);
+            var right = PossibleValue.FromString(parts[2]);
+
+            return new Expression(left, right, operation);
+        }
+        
+        throw new ArgumentOutOfRangeException();
     }
 }
 
 public abstract class Operation(Func<UnsignedIntModType, UnsignedIntModType, UnsignedIntModType> func)
 {
     public UnsignedIntModType Invoke(UnsignedIntModType left, UnsignedIntModType right) => func(left, right);
+
+    public static Operation FromString(string line)
+    {
+        return line switch
+        {
+            "+" => PlusOperation.Create,
+            "-" => MinusOperation.Create,
+            "*" => TimesOperation.Create,
+            "/" => DivOperation.Create,
+            "%" => ModOperation.Create,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
 }
 
 public class DivOperation() : Operation((left, right) => new UnsignedIntModType(left.Value / right.Value))

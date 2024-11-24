@@ -17,6 +17,15 @@ public record PossibleValue(Value Value)
             _ => throw new ArgumentOutOfRangeException()
         };
     }
+
+    public static PossibleValue FromString(string value)
+    {
+        if (value.All(char.IsLetter)) return new PossibleValue(value);
+        
+        if (uint.TryParse(value, out var intValue)) return new PossibleValue(new UnsignedIntModType(intValue));
+
+        return new PossibleValue(Expression.FromString(value));
+    }
     
     public UnsignedIntModType Calc(State state)
     {

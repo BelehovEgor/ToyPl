@@ -193,28 +193,11 @@ public class ToyPlTranslator : ItoyPlParserVisitor<IOperation>
 
     private Comparator GetComparator(toyPlParser.Cond_int_opContext opContext)
     {
-        return opContext.GetText() switch
-        {
-            "=" => Equal.Create,
-            "/=" => NotEqual.Create,
-            ">" => Greater.Create,
-            ">=" => GreaterOrEqual.Create,
-            "<" => Less.Create,
-            "<=" => LessOrEqual.Create,
-            _ => throw new ArgumentOutOfRangeException(nameof(opContext), opContext, null)
-        };
+        return Comparator.FromString(opContext.GetText());
     }
     
     private Operation GetOperation(toyPlParser.Int_opContext opContext)
     {
-        return opContext.GetText() switch
-        {
-            "+" => PlusOperation.Create,
-            "-" => MinusOperation.Create,
-            "*" => TimesOperation.Create,
-            "/" => DivOperation.Create,
-            "%" => ModOperation.Create,
-            _ => throw new ArgumentOutOfRangeException(nameof(opContext), opContext, null)
-        };
+        return Operation.FromString(opContext.GetText());
     }
 }

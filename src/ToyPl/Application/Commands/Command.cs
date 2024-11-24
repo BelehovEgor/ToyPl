@@ -10,16 +10,15 @@ public interface ICommand
     void SetNext(ICommand command);
     State?[] Execute(State? states);
     State?[] Execute(State?[] states);
-    void Print(TextWriter writer);
+    void FillLines(Dictionary<int, string> lines);
 }
 
 public abstract class CommandBase : ICommand
 {
-    private static readonly HashSet<int> AlreadyPrinted = new();
+    private const int Out = -1;
+    
     private static int _commonNumber;
-    protected const int Out = -1;
-
-    private int? _id;
+    protected int? _id;
     public int Id
     {
         get
@@ -40,19 +39,88 @@ public abstract class CommandBase : ICommand
     
     public abstract State?[] Execute(State?[] states);
 
-    public void Print(TextWriter writer)
+    public void FillLines(Dictionary<int, string> lines)
     {
-        var id = Id;
-        if (!AlreadyPrinted.Add(id)) return;
+        if (lines.ContainsKey(Id)) return;
         
-        TryPrint(writer);
+        lines[Id] = GetLine();
+
+        foreach (var command in Goto)
+        {
+            command?.FillLines(lines);
+        }
     }
 
-    public abstract void TryPrint(TextWriter writer);
+    public static ICommand Translate(string code)
+    {
+        var lines = code.Split(Environment.NewLine);
+        
+        var createdCommands = new Dictionary<int, CommandBase>();
+        foreach (var (id, type, content, gotoIds) in lines.Select(GetInfo).Reverse())
+        {
+            createdCommands[id] = type switch
+            {
+                IfCommand.TypeStr => 
+                    IfCommand.Create(
+                        id, 
+                        content, 
+                        createdCommands.GetValueOrDefault(gotoIds[0]), 
+                        createdCommands.GetValueOrDefault(gotoIds[1])),
+                ForkCommand.TypeStr => 
+                    new ForkCommand(
+                        id, 
+                        gotoIds.Select(gotoId => (ICommand?) createdCommands.GetValueOrDefault(gotoId)).ToArray()),
+                ChangeCommand.TypeStr => 
+                    ChangeCommand.Create(
+                        id, 
+                        content, 
+                        createdCommands.GetValueOrDefault(gotoIds[0])),
+                ExitCommand.TypeStr => new ExitCommand(),
+                ClosureCommand.TypeStr => 
+                    new ClosureCommand(
+                        id, 
+                        createdCommands[gotoIds[0]], 
+                        createdCommands.GetValueOrDefault(gotoIds[1])),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        return null!;
+    }
+
+    protected abstract string Type { get; }
+    protected abstract string Content { get; }
+    protected abstract ICommand?[] Goto { get; }
+    
+    private string GetLine() => $"{Id}:{Type}:{Content}:{string.Join(",", Goto.Select(x => x?.Id ?? Out))}";
+
+    private static (int Id, string Type, string Content, int[] GotoIds) GetInfo(string line)
+    {
+        var info = line.Split(':');
+        var id = int.Parse(info[0]);
+        var type = info[1];
+        var content = info[2];
+        var gotoIds = info[3].Split(',').Select(int.Parse).ToArray();
+
+        return (id, type, content, gotoIds);
+    }
 }
 
 public class IfCommand(ICondition condition, ICommand? then, ICommand? @else) : CommandBase
-{ 
+{
+    public const string TypeStr = "if";
+
+    public static IfCommand Create(int id, string content, ICommand? then, ICommand? @else)
+    {
+        throw new ArgumentOutOfRangeException();
+    }
+    
+    public IfCommand(int id, ICondition condition, ICommand? then, ICommand? @else) 
+        : this(condition, then, @else)
+    {
+        _id = id;
+    }
+    
     public override void SetNext(ICommand command)
     {
         then?.SetNext(command);
@@ -71,13 +139,9 @@ public class IfCommand(ICondition condition, ICommand? then, ICommand? @else) : 
             .ToArray();
     }
 
-    public override void TryPrint(TextWriter writer)
-    {
-        writer.WriteLine(
-            $"{Id, 3}: if ({condition}) then {then?.Id ?? Out} else {@else?.Id ?? Out}");
-        then?.Print(writer);
-        @else?.Print(writer);
-    }
+    protected override string Type => TypeStr;
+    protected override string Content => condition.ToString()!;
+    protected override ICommand?[] Goto => [then, @else];
 
     private State?[] DoIfCan(ICommand? command, State state)
     {
@@ -89,6 +153,13 @@ public class IfCommand(ICondition condition, ICommand? then, ICommand? @else) : 
 
 public class ForkCommand(params ICommand?[] possibleNextCommands) : CommandBase
 {
+    public const string TypeStr = "fork";
+
+    public ForkCommand(int id, params ICommand?[] possibleNextCommands) : this(possibleNextCommands)
+    {
+        _id = id;
+    }
+    
     public override void SetNext(ICommand command)
     {
         foreach (var possibleNextCommand in possibleNextCommands)
@@ -111,18 +182,30 @@ public class ForkCommand(params ICommand?[] possibleNextCommands) : CommandBase
             .ToArray();
     }
 
-    public override void TryPrint(TextWriter writer)
-    {
-        writer.WriteLine($"{Id, 3}: fork {string.Join(", ", possibleNextCommands.Select(x => x?.Id ?? Out))}");
-        foreach (var possibleNextCommand in possibleNextCommands)
-        {
-            possibleNextCommand?.Print(writer);
-        }
-    }
+    protected override string Type => TypeStr;
+    protected override string Content => string.Empty;
+    protected override ICommand?[] Goto => possibleNextCommands;
 }
 
 public class ChangeCommand(string left, PossibleValue right, ICommand? nextCommand) : CommandBase
 {
+    public const string TypeStr = "assign";
+
+    public static ChangeCommand Create(int id, string content, ICommand? nextCommand)
+    {
+        var contentParts = content.Split(" := ");
+        var left = contentParts[0];
+        var right = PossibleValue.FromString(contentParts[1]);
+
+        return new ChangeCommand(id, left, right, nextCommand);
+    }
+    
+    public ChangeCommand(int id, string left, PossibleValue right, ICommand? nextCommand)
+        : this(left, right, nextCommand)
+    {
+        _id = id;
+    }
+    
     public override void SetNext(ICommand command)
     {
         nextCommand?.SetNext(command);
@@ -137,15 +220,15 @@ public class ChangeCommand(string left, PossibleValue right, ICommand? nextComma
             : newStates;
     }
 
-    public override void TryPrint(TextWriter writer)
-    {
-        writer.WriteLine($"{Id, 3}: {left} := {right} goto {nextCommand?.Id ?? Out}");
-        nextCommand?.Print(writer);
-    }
+    protected override string Type => TypeStr;
+    protected override string Content => $"{left} := {right}";
+    protected override ICommand?[] Goto => [nextCommand];
 }
 
 public class ExitCommand : CommandBase
 {
+    public const string TypeStr = "exit";
+    
     public override void SetNext(ICommand command)
     {
         
@@ -156,15 +239,22 @@ public class ExitCommand : CommandBase
         return [null];
     }
 
-    public override void TryPrint(TextWriter writer)
-    {
-        writer.WriteLine($"{Id, 3}: exit {Out}");
-    }
+    protected override string Type => TypeStr;
+    protected override string Content => "";
+    protected override ICommand?[] Goto => [null];
 }
 
 public class ClosureCommand(CommandBase body) : CommandBase
 {
+    public const string TypeStr = "closure";
+    
     private ICommand? _next;
+
+    public ClosureCommand(int id, CommandBase body, ICommand? next) : this(body)
+    {
+        _id = id;
+        _next = next;
+    }
     
     public override void SetNext(ICommand command)
     {
@@ -203,12 +293,9 @@ public class ClosureCommand(CommandBase body) : CommandBase
         return unionStates.ToArray();
     }
 
-    public override void TryPrint(TextWriter writer)
-    {
-        writer.WriteLine($"{Id, 3}: closure body {body.Id} out {_next?.Id ?? Out}");
-        body.Print(writer);
-        _next?.Print(writer);
-    }
+    protected override string Type => TypeStr;
+    protected override string Content => string.Empty;
+    protected override ICommand?[] Goto => [body, _next];
 
     private State?[] DoN(State?[] states, int count)
     {

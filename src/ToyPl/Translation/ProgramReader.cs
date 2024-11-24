@@ -28,10 +28,24 @@ public class ProgramReader
         var stringWriter = new StreamWriter(exportTo ?? "code.vm");
         
         var command = operation.Translate(null);
-        command.Print(stringWriter);
 
+        var lines = new Dictionary<int, string>();
+        command.FillLines(lines);
+        foreach (var (_, line) in lines.OrderBy(x => x.Key))
+        {
+            stringWriter.WriteLine(line);
+        }
         stringWriter.Close();
         
         return command;
+    }
+
+    public ICommand GetVm(string filePath)
+    {
+        using StreamReader reader = new(filePath);
+
+        var code = reader.ReadToEnd();
+
+        return CommandBase.Translate(code);
     }
 }
