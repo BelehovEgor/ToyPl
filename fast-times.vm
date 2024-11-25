@@ -1,0 +1,22 @@
+0:assign:a=3:1
+1:assign:b=7:2
+2:assign:z=0:3
+3:fork::4,5
+4:closure::6,7
+5:if:(! (b > 0)):20,21
+6:if:(b > 0):8,9
+7:if:(! (b > 0)):18,19
+8:fork::10,11,12
+9:exit::
+10:if:((b % 2) = 1):13,14
+11:if:(! ((b % 2) = 1)):15,16
+12:assign:a=(a * 2):17
+13:assign:z=(z + a):
+14:exit::
+15:empty::
+16:exit::
+17:assign:b=(b / 2):
+18:empty::
+19:exit::
+20:empty::
+21:exit::

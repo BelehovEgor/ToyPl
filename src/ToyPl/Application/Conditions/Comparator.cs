@@ -1,5 +1,4 @@
 using ToyPl.Application.Models;
-using ToyPl.Extensions;
 
 namespace ToyPl.Application.Conditions;
 
@@ -10,6 +9,20 @@ public abstract class Comparator(Func<UnsignedIntModType, UnsignedIntModType, bo
         if (expressions.Length != 2) throw new InvalidOperationException();
 
         return predicate(expressions[0].Calc(state), expressions[1].Calc(state));
+    }
+
+    public static Comparator FromString(string line)
+    {
+        return line switch
+        {
+            "=" => Equal.Create,
+            "/=" => NotEqual.Create,
+            ">" => Greater.Create,
+            ">=" => GreaterOrEqual.Create,
+            "<" => Less.Create,
+            "<=" => LessOrEqual.Create,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }
 
@@ -24,7 +37,7 @@ public class NotEqual() : Comparator((l, r) => l.Value != r.Value)
 {
     public static Comparator Create => new NotEqual();
     
-    public override string ToString() => "!=";
+    public override string ToString() => "/=";
 }
 
 public class Less() : Comparator((l, r) => l.Value < r.Value)
@@ -54,5 +67,5 @@ public class Equal() : Comparator((l, r) => l.Value == r.Value)
 {
     public static Comparator Create => new Equal();
     
-    public override string ToString() => "==";
+    public override string ToString() => "=";
 }
