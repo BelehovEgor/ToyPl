@@ -55,33 +55,33 @@ public class DivOperation() : Operation((left, right) => new UnsignedIntModType(
 {
     public static Operation Create => new DivOperation();
 
-    public override string ToString() => "div";
+    public override string ToString() => "/";
 }
 
 public class MinusOperation() : Operation((left, right) => new UnsignedIntModType(left.Value - right.Value))
 {
     public static Operation Create => new MinusOperation();
 
-    public override string ToString() => "minus";
+    public override string ToString() => "-";
 }
 
 public class ModOperation() : Operation((left, right) => new UnsignedIntModType(left.Value % right.Value))
 {
     public static Operation Create => new ModOperation();
     
-    public override string ToString() => "mod";
+    public override string ToString() => "%";
 }
 
 public class PlusOperation() : Operation((left, right) => new UnsignedIntModType(left.Value + right.Value))
 {
     public static Operation Create => new PlusOperation();
     
-    public override string ToString() => "plus";
+    public override string ToString() => "+";
 }
 
 public class TimesOperation() : Operation((left, right) => new UnsignedIntModType(left.Value * right.Value))
 {
     public static Operation Create => new TimesOperation();
     
-    public override string ToString() => "times";
+    public override string ToString() => "*";
 }

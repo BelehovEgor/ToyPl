@@ -6,6 +6,11 @@ namespace ToyPl.Application.Commands;
 public class ForkCommand(ICommand left, ICommand right, ICommand? next) : CommandBase(next)
 {
     public const string TypeStr = "fork";
+
+    public ForkCommand(int id, ICommand left, ICommand right, ICommand? next) : this(left, right, next)
+    {
+        _id = id;
+    }
     
     protected override State?[] ExecuteInternal(State?[] states)
     {
@@ -21,5 +26,5 @@ public class ForkCommand(ICommand left, ICommand right, ICommand? next) : Comman
 
     protected override string Type => TypeStr;
     protected override string Content => string.Empty;
-    protected override ICommand[] Goto => next is null ? [left, right] : [left, right, next];
+    protected override ICommand[] Goto => Next is null ? [left, right] : [left, right, Next];
 }

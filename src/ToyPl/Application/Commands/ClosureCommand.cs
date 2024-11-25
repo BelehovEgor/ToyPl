@@ -12,6 +12,11 @@ public class ClosureCommand : CommandBase
     {
         _body = body;
     }
+    
+    public ClosureCommand(int id, CommandBase body, ICommand? next) : this(body, next)
+    {
+        _id = id;
+    }
 
     protected override State?[] ExecuteInternal(State?[] states)
     {

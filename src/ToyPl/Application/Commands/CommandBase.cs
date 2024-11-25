@@ -5,7 +5,7 @@ namespace ToyPl.Application.Commands;
 public abstract class CommandBase(ICommand? next) : ICommand
 {
     private static int _commonNumber;
-    private int? _id;
+    protected int? _id;
     public int Id
     {
         get
@@ -42,17 +42,6 @@ public abstract class CommandBase(ICommand? next) : ICommand
     protected abstract string Content { get; }
     protected abstract ICommand[] Goto { get; }
     protected abstract State?[] ExecuteInternal(State?[] states);
-
     
     private string GetLine() => $"{Id}:{Type}:{Content}:{string.Join(",", Goto.Select(x => x.Id))}";
-    private static (int Id, string Type, string Content, int[] GotoIds) GetInfo(string line)
-    {
-        var info = line.Split(':');
-        var id = int.Parse(info[0]);
-        var type = info[1];
-        var content = info[2];
-        var gotoIds = info[3].Split(',').Select(int.Parse).ToArray();
-
-        return (id, type, content, gotoIds);
-    }
 }

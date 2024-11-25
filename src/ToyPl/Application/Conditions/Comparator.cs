@@ -37,7 +37,7 @@ public class NotEqual() : Comparator((l, r) => l.Value != r.Value)
 {
     public static Comparator Create => new NotEqual();
     
-    public override string ToString() => "!=";
+    public override string ToString() => "/=";
 }
 
 public class Less() : Comparator((l, r) => l.Value < r.Value)

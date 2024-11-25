@@ -4,13 +4,6 @@ namespace ToyPl.Application.Models;
 
 public record State(IDictionary<string, UnsignedIntModType> Variables)
 {
-    public bool IsEqual(State other)
-    {
-        var comparer = new StateComparer();
-
-        return comparer.Equals(this, other);
-    }
-
     public string ToBeautyString()
     {
         return $"({string.Join(", ", Variables.OrderBy(x => x.Key).Select(x => $"{x.Key}: {x.Value.Value}"))})";

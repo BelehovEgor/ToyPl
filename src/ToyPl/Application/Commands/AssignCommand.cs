@@ -6,6 +6,12 @@ public class AssignCommand(string left, PossibleValue right, ICommand? nextComma
 {
     public const string TypeStr = "assign";
 
+    public AssignCommand(int id, string left, PossibleValue right, ICommand? nextCommand) 
+        : this(left, right, nextCommand)
+    {
+        _id = id;
+    }
+    
     protected override State?[] ExecuteInternal(State?[] states)
     {
         return states.Select(x => x?.Update(left, right.Calc(x))).ToArray();

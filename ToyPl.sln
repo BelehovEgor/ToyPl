@@ -24,6 +24,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{47
 		fibbonachi.tpl = fibbonachi.tpl
 		mults.tpl = mults.tpl
 		volume.tpl = volume.tpl
+		boom.vm = boom.vm
+		fast-times.vm = fast-times.vm
+		mults.vm = mults.vm
 	EndProjectSection
 EndProject
 Global

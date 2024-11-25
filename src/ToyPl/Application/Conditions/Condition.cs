@@ -29,7 +29,7 @@ public class NotCondition(ICondition condition) : ConditionBase
         return !condition.Check(state);
     }
 
-    public override string ToString() => $"(not {condition})";
+    public override string ToString() => $"(! {condition})";
 }
 
 public class AndCondition(ICondition left, ICondition right) : ConditionBase
@@ -39,7 +39,7 @@ public class AndCondition(ICondition left, ICondition right) : ConditionBase
         return left.Check(state) && right.Check(state);
     }
     
-    public override string ToString() => $"({left} and {right})";
+    public override string ToString() => $"({left} && {right})";
 }
 
 public class OrCondition(ICondition left, ICondition right) : ConditionBase
@@ -49,6 +49,6 @@ public class OrCondition(ICondition left, ICondition right) : ConditionBase
         return left.Check(state) || right.Check(state);
     }
     
-    public override string ToString() => $"({left} or {right})";
+    public override string ToString() => $"({left} || {right})";
 }
 

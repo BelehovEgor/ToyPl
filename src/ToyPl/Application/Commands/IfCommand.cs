@@ -7,6 +7,11 @@ public class IfCommand(ICondition condition, ICommand then, ICommand @else) : Co
 {
     public const string TypeStr = "if";
 
+    public IfCommand(int id, ICondition condition, ICommand then, ICommand @else) : this(condition, then, @else)
+    {
+        _id = id;
+    }
+    
     protected override State?[] ExecuteInternal(State?[] states)
     {
         return states
