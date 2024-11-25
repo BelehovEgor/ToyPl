@@ -13,5 +13,5 @@ public class EmptyCommand(ICommand? next) : CommandBase(next)
 
     protected override string Type => TypeStr;
     protected override string Content => "";
-    protected override ICommand[] Goto => [];
+    protected override ICommand[] Goto => Next is null ? [] : [Next];
 }

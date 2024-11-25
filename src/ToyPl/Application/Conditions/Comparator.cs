@@ -1,5 +1,4 @@
 using ToyPl.Application.Models;
-using ToyPl.Extensions;
 
 namespace ToyPl.Application.Conditions;
 
@@ -68,5 +67,5 @@ public class Equal() : Comparator((l, r) => l.Value == r.Value)
 {
     public static Comparator Create => new Equal();
     
-    public override string ToString() => "==";
+    public override string ToString() => "=";
 }

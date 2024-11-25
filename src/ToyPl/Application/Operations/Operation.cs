@@ -37,7 +37,7 @@ public record TestOperation(ICondition Condition) : IOperation
 {
     public CommandBase Translate(ICommand? next)
     {
-        return new IfCommand(Condition, next ?? new EmptyCommand(next), new ExitCommand(), null);
+        return new IfCommand(Condition, next ?? new EmptyCommand(next), new ExitCommand());
     }
 }
 

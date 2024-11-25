@@ -21,5 +21,5 @@ public class ForkCommand(ICommand left, ICommand right, ICommand? next) : Comman
 
     protected override string Type => TypeStr;
     protected override string Content => string.Empty;
-    protected override ICommand[] Goto => [left, right];
+    protected override ICommand[] Goto => next is null ? [left, right] : [left, right, next];
 }

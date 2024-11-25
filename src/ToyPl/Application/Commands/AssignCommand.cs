@@ -12,6 +12,6 @@ public class AssignCommand(string left, PossibleValue right, ICommand? nextComma
     }
 
     protected override string Type => TypeStr;
-    protected override string Content => $"{left}:={right}";
+    protected override string Content => $"{left}={right}";
     protected override ICommand[] Goto => Next is null ? [] : [Next];
 }

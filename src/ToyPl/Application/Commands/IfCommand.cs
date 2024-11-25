@@ -3,7 +3,7 @@ using ToyPl.Application.Models;
 
 namespace ToyPl.Application.Commands;
 
-public class IfCommand(ICondition condition, ICommand then, ICommand @else, ICommand? next) : CommandBase(next)
+public class IfCommand(ICondition condition, ICommand then, ICommand @else) : CommandBase(null)
 {
     public const string TypeStr = "if";
 
