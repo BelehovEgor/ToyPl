@@ -12,7 +12,7 @@ public record AssignOperation(string LeftValue, PossibleValue RightValue) : IOpe
 {
     public CommandBase Translate(ICommand? next)
     {
-        return new ChangeCommand(LeftValue, RightValue, next);
+        return new AssignCommand(LeftValue, RightValue, next);
     }
 }
 
@@ -20,11 +20,7 @@ public record ClosureOperation(IOperation Body) : IOperation
 {
     public CommandBase Translate(ICommand? next)
     {
-        var closure = new ClosureCommand(Body.Translate(null));
-        
-        if (next is not null) closure.SetNext(next);
-
-        return closure;
+        return new ClosureCommand(Body.Translate(null), next);
     }
 }
 
@@ -33,9 +29,7 @@ public record CompositionOperation(IOperation First, IOperation Second) : IOpera
     public CommandBase Translate(ICommand? next)
     {
         var secondTranslated = Second.Translate(next);
-        var firstTranslated = First.Translate(secondTranslated);
-
-        return firstTranslated;
+        return First.Translate(secondTranslated);
     }
 }
 
@@ -43,7 +37,7 @@ public record TestOperation(ICondition Condition) : IOperation
 {
     public CommandBase Translate(ICommand? next)
     {
-        return new IfCommand(Condition, next, new ExitCommand());
+        return new IfCommand(Condition, next ?? new EmptyCommand(next), new ExitCommand(), null);
     }
 }
 
@@ -51,9 +45,9 @@ public record UnionOperation(IOperation First, IOperation Second) : IOperation
 {
     public CommandBase Translate(ICommand? next)
     {
-        var firstTranslate = First.Translate(next);
-        var secondTranslate = Second.Translate(next);
+        var firstTranslate = First.Translate(null);
+        var secondTranslate = Second.Translate(null);
 
-        return new ForkCommand(firstTranslate, secondTranslate);
+        return new ForkCommand(firstTranslate, secondTranslate, next);
     }
 }

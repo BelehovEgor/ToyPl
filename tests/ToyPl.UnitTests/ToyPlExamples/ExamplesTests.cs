@@ -30,7 +30,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -56,7 +56,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -81,7 +81,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -109,7 +109,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -135,7 +135,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -159,7 +159,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -181,7 +181,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         if (result is null) return;
@@ -212,7 +212,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -242,7 +242,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -272,7 +272,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -301,7 +301,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -329,7 +329,7 @@ public class ExamplesTests
             .Build();
 
         // Act
-        var result = command.Execute(state).GetRandom();
+        var result = command.Execute([state]).GetRandom();
 
         // Assert
         result.Should().NotBeNull();
@@ -364,6 +364,6 @@ public class ExamplesTests
             .Build();
 
         // Act
-        _ = command.Execute(state);
+        _ = command.Execute([state]);
     }
 }

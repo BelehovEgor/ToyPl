@@ -46,6 +46,6 @@ public class ProgramReader
 
         var code = reader.ReadToEnd();
 
-        return CommandBase.Translate(code);
+        return null!;
     }
 }

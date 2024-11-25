@@ -31,7 +31,7 @@ try
     var state = new State(variablesDict);
 
     var command = programReader.Translate(program, outputMlFile);
-    var result = command.Execute(state).GetRandom();
+    var result = command.Execute([state]).GetRandom();
     Console.WriteLine(result?.ToBeautyString() ?? "Failed");
 }
 catch (Exception ex)
